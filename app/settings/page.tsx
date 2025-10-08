@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { TravelModeSettings } from "@/components/travel-mode-settings"
 import { GeneralSettings } from "@/components/general-settings"
 import { AccountSettings } from "@/components/account-settings"
 import { ArrowLeft, Users, ChevronRight, LogOut, Box } from "lucide-react"
@@ -54,7 +53,7 @@ export default function SettingsPage() {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Family & Sharing</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Caregivers & Sharing</h2>
             <Link href="/settings/family">
               <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer">
                 <div className="flex items-center gap-4">
@@ -71,7 +70,6 @@ export default function SettingsPage() {
             </Link>
           </Card>
 
-          <TravelModeSettings />
           <GeneralSettings />
           <AccountSettings />
 
