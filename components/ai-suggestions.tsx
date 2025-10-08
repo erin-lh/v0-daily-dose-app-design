@@ -28,7 +28,7 @@ export function AISuggestions({ suggestions }: AISuggestionsProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold">Smart Insights</h3>
-          <p className="text-sm text-muted-foreground">Personalized suggestions for you</p>
+          <p className="text-sm text-muted-foreground">Personalised suggestions for you</p>
         </div>
         <Lightbulb className="w-5 h-5 text-primary" />
       </div>
