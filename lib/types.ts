@@ -4,6 +4,8 @@ export interface Medication {
   description?: string
   dosage: string
   color?: string // For visual identification (e.g., "red pill")
+  format?: "pill" | "cream" | "injection" | "liquid" | "inhaler" | "patch" | "other" // Optional medication format
+  notInPillBox?: boolean // True if medication is stored elsewhere (fridge, etc.)
   frequency: "daily" | "multiple" | "as-needed" | "temporary"
   times: string[] // Array of time strings like ["08:00", "20:00"]
   startDate: Date

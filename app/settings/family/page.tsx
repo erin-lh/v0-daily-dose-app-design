@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Users, Copy, Check, Trash2, ChevronLeft, Mail, Bell, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { AddCaregiverDialog } from "@/components/add-caregiver-dialog"
 
 interface FamilyMember {
   id: string
@@ -23,9 +24,9 @@ interface FamilyMember {
 }
 
 export default function FamilyManagementPage() {
-  const [familyCode] = useState("ABC123")
+  const [caregiverCode] = useState("ABC123")
   const [copied, setCopied] = useState(false)
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
+  const [caregivers, setCaregivers] = useState<FamilyMember[]>([
     {
       id: "1",
       name: "Sarah Johnson",
@@ -40,17 +41,17 @@ export default function FamilyManagementPage() {
   ])
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText(familyCode)
+    navigator.clipboard.writeText(caregiverCode)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   const handleRemoveMember = (memberId: string) => {
-    setFamilyMembers((prev) => prev.filter((m) => m.id !== memberId))
+    setCaregivers((prev) => prev.filter((m) => m.id !== memberId))
   }
 
   const handleToggleMarkDoses = (memberId: string) => {
-    setFamilyMembers((prev) =>
+    setCaregivers((prev) =>
       prev.map((m) =>
         m.id === memberId
           ? {
@@ -65,6 +66,21 @@ export default function FamilyManagementPage() {
     )
   }
 
+  const handleAddCaregiver = (caregiver: { name: string; email: string; canMarkDoses: boolean }) => {
+    const newCaregiver: FamilyMember = {
+      id: Date.now().toString(),
+      name: caregiver.name,
+      email: caregiver.email,
+      joinedAt: new Date(),
+      allowedMedications: [],
+      permissions: {
+        canMarkDoses: caregiver.canMarkDoses,
+        canViewHistory: false,
+      },
+    }
+    setCaregivers((prev) => [...prev, newCaregiver])
+  }
+
   return (
     <div className="min-h-screen bg-background pb-safe">
       <header className="border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-10 safe-top">
@@ -75,7 +91,7 @@ export default function FamilyManagementPage() {
                 <ChevronLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="text-lg font-semibold">Family Access</h1>
+            <h1 className="text-lg font-semibold">Caregiver Access</h1>
             <div className="w-11" />
           </div>
         </div>
@@ -83,7 +99,7 @@ export default function FamilyManagementPage() {
 
       <main className="px-5 py-8">
         <div className="space-y-8 max-w-lg mx-auto">
-          {/* Family Code Section */}
+          {/* Caregiver Code Section */}
           <Card className="p-6">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -91,16 +107,16 @@ export default function FamilyManagementPage() {
                   <Users className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">Your Family Code</h2>
-                  <p className="text-sm text-muted-foreground">Share this code with family members</p>
+                  <h2 className="text-lg font-semibold text-foreground">Your Caregiver Code</h2>
+                  <p className="text-sm text-muted-foreground">Share this code with caregivers and loved ones</p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Family Code</Label>
+                <Label className="text-sm font-medium">Caregiver Code</Label>
                 <div className="flex gap-2">
                   <Input
-                    value={familyCode}
+                    value={caregiverCode}
                     readOnly
                     className="h-14 text-center text-2xl font-semibold tracking-widest"
                   />
@@ -112,33 +128,36 @@ export default function FamilyManagementPage() {
 
               <Card className="p-4 bg-secondary/30 border-primary/20">
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Family members can use this code to join and help you stay consistent. They'll receive notifications
-                  and can mark doses for you.
+                  Caregivers and loved ones can use this code to join and help you stay consistent. They'll receive
+                  notifications and can mark doses for you.
                 </p>
               </Card>
             </div>
           </Card>
 
-          {/* Family Members List */}
+          {/* Caregivers List */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">Family Members</h2>
-              <Badge variant="secondary">{familyMembers.length}</Badge>
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold text-foreground">Caregivers</h2>
+                <Badge variant="secondary">{caregivers.length}</Badge>
+              </div>
+              <AddCaregiverDialog onAdd={handleAddCaregiver} />
             </div>
 
-            {familyMembers.length === 0 ? (
+            {caregivers.length === 0 ? (
               <Card className="p-8 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
                   <Users className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">No family members yet</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No caregivers yet</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Share your family code to invite someone to help with your routine
+                  Share your caregiver code to invite someone to help with your routine
                 </p>
               </Card>
             ) : (
               <div className="space-y-3">
-                {familyMembers.map((member) => (
+                {caregivers.map((member) => (
                   <Card key={member.id} className="p-5">
                     <div className="space-y-4">
                       <div className="flex items-start justify-between">

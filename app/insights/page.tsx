@@ -9,6 +9,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import { AdherenceChart } from "@/components/adherence-chart"
 import { TimingInsights } from "@/components/timing-insights"
 import { AISuggestions } from "@/components/ai-suggestions"
+import { MedicationTimeline } from "@/components/medication-timeline"
 import { mockInsightData, mockInsightSuggestions, mockPillBoxes } from "@/lib/mock-data"
 import type { PillBox } from "@/lib/types"
 
@@ -90,14 +91,18 @@ export default function InsightsPage() {
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
-            <TimingInsights data={mockInsightData} />
-          </section>
-
-          <section className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
             <AISuggestions suggestions={mockInsightSuggestions} />
           </section>
 
+          <section className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
+            <TimingInsights data={mockInsightData} />
+          </section>
+
           <section className="slide-up-enter" style={{ animationDelay: "0.2s" }}>
+            <MedicationTimeline doseLogs={activePillBox.doseLogs} medications={activePillBox.medications} days={7} />
+          </section>
+
+          <section className="slide-up-enter" style={{ animationDelay: "0.25s" }}>
             <Card className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
               <h3 className="text-base font-semibold mb-2">Keep Going!</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">

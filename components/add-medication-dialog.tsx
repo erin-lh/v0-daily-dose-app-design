@@ -23,6 +23,10 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
   const [description, setDescription] = useState("")
   const [dosage, setDosage] = useState("")
   const [color, setColor] = useState("")
+  const [format, setFormat] = useState<"pill" | "cream" | "injection" | "liquid" | "inhaler" | "patch" | "other" | "">(
+    "",
+  )
+  const [notInPillBox, setNotInPillBox] = useState(false)
   const [frequency, setFrequency] = useState<"daily" | "multiple" | "as-needed" | "temporary">("daily")
   const [times, setTimes] = useState<string[]>(["08:00"])
   const [isTemporary, setIsTemporary] = useState(false)
@@ -51,6 +55,8 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
       description: description || undefined,
       dosage,
       color: color || undefined,
+      format: format || undefined,
+      notInPillBox: notInPillBox || undefined,
       frequency,
       times,
       startDate: new Date(),
@@ -64,6 +70,8 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
     setDescription("")
     setDosage("")
     setColor("")
+    setFormat("")
+    setNotInPillBox(false)
     setFrequency("daily")
     setTimes(["08:00"])
     setIsTemporary(false)
@@ -131,6 +139,25 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
                 />
               </div>
             </div>
+
+            {/* Medication Format Selector */}
+            <div className="space-y-2">
+              <Label htmlFor="format">Format (Optional)</Label>
+              <Select value={format} onValueChange={(value: any) => setFormat(value)}>
+                <SelectTrigger id="format">
+                  <SelectValue placeholder="Select format..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pill">Pill/Tablet</SelectItem>
+                  <SelectItem value="cream">Cream/Ointment</SelectItem>
+                  <SelectItem value="injection">Injection</SelectItem>
+                  <SelectItem value="liquid">Liquid/Syrup</SelectItem>
+                  <SelectItem value="inhaler">Inhaler</SelectItem>
+                  <SelectItem value="patch">Patch</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Frequency */}
@@ -184,6 +211,15 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Not Stored in PillBox Toggle */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Not Stored in PillBox</Label>
+              <p className="text-xs text-muted-foreground">For medications in fridge, etc.</p>
+            </div>
+            <Switch checked={notInPillBox} onCheckedChange={setNotInPillBox} />
           </div>
 
           {/* Temporary Medication */}
