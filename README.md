@@ -1,7 +1,3 @@
-Thought for 7sHere's an updated README overview that accurately reflects the current DailyDose+ app:
-
----
-
 # DailyDose+
 
 **Tech-Enabled Wellness for Medication Adherence**
