@@ -77,7 +77,7 @@ export default function HomePage() {
                   <Users className="w-7 h-7 text-primary" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <h3 className="text-xl font-semibold text-foreground">Join Family</h3>
+                  <h3 className="text-xl font-semibold text-foreground">Join As Caregiver</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     Help a loved one stay consistent by receiving notifications and marking doses
                   </p>

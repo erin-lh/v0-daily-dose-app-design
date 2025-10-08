@@ -41,6 +41,57 @@ export interface PillBoxStatus {
 
 export type PillBoxStatusType = PillBoxStatus
 
+export interface PillBox {
+  id: string
+  ownerName: string
+  emoji: string // Emoji avatar for visual identification
+  medications: Medication[]
+  doseLogs: DoseLog[]
+  streak: Streak
+  hardwareId?: string // Physical pill box device ID
+  isActive: boolean
+  createdAt: Date
+}
+
+export interface FamilyMember {
+  id: string
+  name: string
+  email: string
+  joinedAt: Date
+  allowedMedications: string[]
+  permissions: {
+    canMarkDoses: boolean // If false, can only receive notifications
+    canViewHistory: boolean
+  }
+}
+
+export interface TravelDocument {
+  id: string
+  type: "prescription" | "bottle-label" | "other"
+  medicationId?: string
+  imageUrl: string
+  fileName: string
+  uploadedAt: Date
+  notes?: string
+}
+
+export interface InsightData {
+  date: Date
+  adherenceRate: number
+  dosesTaken: number
+  dosesScheduled: number
+  averageDelay: number // Minutes late/early
+}
+
+export interface InsightSuggestion {
+  id: string
+  type: "timing" | "consistency" | "streak" | "general"
+  medicationId?: string
+  message: string
+  priority: "low" | "medium" | "high"
+  createdAt: Date
+}
+
 export interface UserSettings {
   notifications: {
     push: boolean
@@ -51,6 +102,9 @@ export interface UserSettings {
   travelMode: {
     enabled: boolean
     timezone?: string
+    destination?: string
+    startDate?: Date
+    endDate?: Date
   }
   lockMode: boolean
   theme: "light" | "dark" | "auto"

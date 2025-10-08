@@ -6,6 +6,7 @@ import { NotificationsPanel } from "@/components/notifications-panel"
 import { ReminderSettings } from "@/components/reminder-settings"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { BottomNav } from "@/components/bottom-nav"
 
 interface Notification {
   id: string
@@ -63,27 +64,25 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-background pb-24">
+      <header className="border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-10 safe-top">
+        <div className="px-5 py-4">
+          <div className="flex items-center gap-3">
             <Link href="/dashboard">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Notifications & Reminders</h1>
-              <p className="text-sm text-muted-foreground">Manage your alerts and preferences</p>
+              <h1 className="text-xl font-semibold">Notifications</h1>
+              <p className="text-sm text-muted-foreground">Manage alerts & reminders</p>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
+      <main className="px-5 py-6">
+        <div className="space-y-6 max-w-lg mx-auto">
           <NotificationsPanel
             notifications={notifications}
             onDismiss={handleDismiss}
@@ -92,6 +91,8 @@ export default function NotificationsPage() {
           <ReminderSettings />
         </div>
       </main>
+
+      <BottomNav />
     </div>
   )
 }

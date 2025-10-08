@@ -5,9 +5,10 @@ import { Card } from "@/components/ui/card"
 import { TravelModeSettings } from "@/components/travel-mode-settings"
 import { GeneralSettings } from "@/components/general-settings"
 import { AccountSettings } from "@/components/account-settings"
-import { ArrowLeft, Users, ChevronRight, LogOut } from "lucide-react"
+import { ArrowLeft, Users, ChevronRight, LogOut, Box } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { BottomNav } from "@/components/bottom-nav"
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -17,7 +18,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-safe">
+    <div className="min-h-screen bg-background pb-24">
       <header className="border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-10 safe-top">
         <div className="px-5 py-5">
           <div className="flex items-center justify-between">
@@ -34,6 +35,24 @@ export default function SettingsPage() {
 
       <main className="px-5 py-8">
         <div className="space-y-8 max-w-lg mx-auto">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Household</h2>
+            <Link href="/settings/pillboxes">
+              <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Box className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-foreground">Manage Pill Boxes</h3>
+                    <p className="text-sm text-muted-foreground">Add household members and their medications</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+            </Link>
+          </Card>
+
           <Card className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Family & Sharing</h2>
             <Link href="/settings/family">
@@ -68,6 +87,8 @@ export default function SettingsPage() {
           </Card>
         </div>
       </main>
+
+      <BottomNav />
     </div>
   )
 }

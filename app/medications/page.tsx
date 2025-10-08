@@ -5,24 +5,37 @@ import { Button } from "@/components/ui/button"
 import { AddMedicationDialog } from "@/components/add-medication-dialog"
 import { MedicationList } from "@/components/medication-list"
 import { ArrowLeft, Plus } from "lucide-react"
-import { mockMedications } from "@/lib/mock-data"
-import type { Medication } from "@/lib/types"
+import { mockPillBoxes } from "@/lib/mock-data"
+import type { Medication, PillBox } from "@/lib/types"
 import Link from "next/link"
+import { BottomNav } from "@/components/bottom-nav"
+import { cn } from "@/lib/utils"
 
 export default function MedicationsPage() {
-  const [medications, setMedications] = useState<Medication[]>(() => {
+  const [pillBoxes, setPillBoxes] = useState<PillBox[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("dailydose-medications")
-      return saved ? JSON.parse(saved) : mockMedications
+      const saved = localStorage.getItem("dailydose-pillboxes")
+      return saved ? JSON.parse(saved) : mockPillBoxes
     }
-    return mockMedications
+    return mockPillBoxes
   })
+
+  const [activePillBoxId, setActivePillBoxId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("dailydose-active-pillbox")
+      return saved || pillBoxes[0]?.id
+    }
+    return pillBoxes[0]?.id
+  })
+
+  const activePillBox = pillBoxes.find((pb) => pb.id === activePillBoxId) || pillBoxes[0]
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("dailydose-medications", JSON.stringify(medications))
+      localStorage.setItem("dailydose-pillboxes", JSON.stringify(pillBoxes))
+      localStorage.setItem("dailydose-active-pillbox", activePillBoxId)
     }
-  }, [medications])
+  }, [pillBoxes, activePillBoxId])
 
   const handleAddMedication = (newMed: Omit<Medication, "id" | "createdAt">) => {
     const medication: Medication = {
@@ -30,38 +43,42 @@ export default function MedicationsPage() {
       id: Date.now().toString(),
       createdAt: new Date(),
     }
-    const updatedMedications = [...medications, medication]
-    setMedications(updatedMedications)
+
+    setPillBoxes((prev) =>
+      prev.map((pb) => (pb.id === activePillBoxId ? { ...pb, medications: [...pb.medications, medication] } : pb)),
+    )
   }
 
   const handleDeleteMedication = (id: string) => {
-    const updatedMedications = medications.filter((m) => m.id !== id)
-    setMedications(updatedMedications)
+    setPillBoxes((prev) =>
+      prev.map((pb) =>
+        pb.id === activePillBoxId ? { ...pb, medications: pb.medications.filter((m) => m.id !== id) } : pb,
+      ),
+    )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-background pb-24">
+      <header className="border-b border-border/30 bg-background/95 backdrop-blur-xl sticky top-0 z-10 safe-top">
+        <div className="px-5 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Link href="/dashboard">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">My Medications</h1>
-                <p className="text-sm text-muted-foreground">{medications.length} active medications</p>
+                <h1 className="text-xl font-semibold">Medications</h1>
+                <p className="text-sm text-muted-foreground">{activePillBox.medications.length} active</p>
               </div>
             </div>
             <AddMedicationDialog
               onAdd={handleAddMedication}
               trigger={
-                <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90">
+                <Button size="sm" className="gap-2 rounded-full h-10 px-4">
                   <Plus className="w-4 h-4" />
-                  Add New
+                  Add
                 </Button>
               }
             />
@@ -69,10 +86,35 @@ export default function MedicationsPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <MedicationList medications={medications} onDelete={handleDeleteMedication} />
+      <main className="px-5 py-6">
+        <div className="max-w-lg mx-auto space-y-6">
+          {pillBoxes.length > 1 && (
+            <section className="slide-up-enter">
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                {pillBoxes.map((pb) => (
+                  <button
+                    key={pb.id}
+                    onClick={() => setActivePillBoxId(pb.id)}
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2.5 rounded-2xl border-2 transition-all whitespace-nowrap",
+                      pb.id === activePillBoxId
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border/30 bg-background text-muted-foreground hover:border-primary/30",
+                    )}
+                  >
+                    <span className="text-xl">{pb.emoji}</span>
+                    <span className="text-sm font-medium">{pb.ownerName}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <MedicationList medications={activePillBox.medications} onDelete={handleDeleteMedication} />
+        </div>
       </main>
+
+      <BottomNav />
     </div>
   )
 }

@@ -1,4 +1,13 @@
-import type { Medication, DoseLog, Streak, PillBoxStatus } from "./types"
+import type {
+  Medication,
+  DoseLog,
+  Streak,
+  PillBoxStatus,
+  PillBox,
+  TravelDocument,
+  InsightData,
+  InsightSuggestion,
+} from "./types"
 
 export const mockMedications: Medication[] = [
   {
@@ -81,6 +90,74 @@ export const mockDoseLogs: DoseLog[] = [
     medicationId: "3",
     scheduledTime: new Date(new Date().setHours(8, 0, 0, 0)),
     status: "pending",
+    createdAt: new Date(),
+  },
+]
+
+export const mockPillBoxes: PillBox[] = [
+  {
+    id: "1",
+    ownerName: "Myself",
+    emoji: "👤",
+    medications: mockMedications,
+    doseLogs: mockDoseLogs,
+    streak: mockStreak,
+    hardwareId: "DDPLUS-001",
+    isActive: true,
+    createdAt: new Date("2025-01-01"),
+  },
+]
+
+export const mockTravelDocuments: TravelDocument[] = [
+  {
+    id: "1",
+    type: "prescription",
+    medicationId: "3",
+    imageUrl: "/prescription-document.jpg",
+    fileName: "blood-pressure-prescription.jpg",
+    uploadedAt: new Date("2025-09-15"),
+    notes: "Valid until Dec 2025",
+  },
+]
+
+export const mockInsightData: InsightData[] = Array.from({ length: 30 }, (_, i) => {
+  const date = new Date()
+  date.setDate(date.getDate() - (29 - i))
+  const adherenceRate = 85 + Math.random() * 15 // 85-100%
+  const dosesScheduled = 3
+  const dosesTaken = Math.round((adherenceRate / 100) * dosesScheduled)
+
+  return {
+    date,
+    adherenceRate,
+    dosesTaken,
+    dosesScheduled,
+    averageDelay: Math.random() * 60 - 30, // -30 to +30 minutes
+  }
+})
+
+export const mockInsightSuggestions: InsightSuggestion[] = [
+  {
+    id: "1",
+    type: "timing",
+    medicationId: "1",
+    message:
+      "You're consistently taking Vitamin D 45 minutes late. Consider setting your reminder for 7:15 AM instead of 8:00 AM.",
+    priority: "medium",
+    createdAt: new Date(),
+  },
+  {
+    id: "2",
+    type: "consistency",
+    message: "Great work! You've maintained 95%+ adherence for 2 weeks straight. Keep up the momentum!",
+    priority: "low",
+    createdAt: new Date(),
+  },
+  {
+    id: "3",
+    type: "streak",
+    message: "You're just 3 days away from your longest streak ever. Stay consistent!",
+    priority: "high",
     createdAt: new Date(),
   },
 ]

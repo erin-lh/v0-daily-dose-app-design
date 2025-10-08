@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Copy, Check, Trash2, ChevronLeft, Mail } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Users, Copy, Check, Trash2, ChevronLeft, Mail, Bell, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
 interface FamilyMember {
@@ -15,6 +16,10 @@ interface FamilyMember {
   email: string
   joinedAt: Date
   allowedMedications: string[]
+  permissions: {
+    canMarkDoses: boolean
+    canViewHistory: boolean
+  }
 }
 
 export default function FamilyManagementPage() {
@@ -27,6 +32,10 @@ export default function FamilyManagementPage() {
       email: "sarah@example.com",
       joinedAt: new Date("2024-01-15"),
       allowedMedications: ["1", "2"],
+      permissions: {
+        canMarkDoses: true,
+        canViewHistory: false,
+      },
     },
   ])
 
@@ -38,6 +47,22 @@ export default function FamilyManagementPage() {
 
   const handleRemoveMember = (memberId: string) => {
     setFamilyMembers((prev) => prev.filter((m) => m.id !== memberId))
+  }
+
+  const handleToggleMarkDoses = (memberId: string) => {
+    setFamilyMembers((prev) =>
+      prev.map((m) =>
+        m.id === memberId
+          ? {
+              ...m,
+              permissions: {
+                ...m.permissions,
+                canMarkDoses: !m.permissions.canMarkDoses,
+              },
+            }
+          : m,
+      ),
+    )
   }
 
   return (
@@ -144,7 +169,42 @@ export default function FamilyManagementPage() {
                         </Button>
                       </div>
 
-                      <div className="pt-4 border-t border-border/50">
+                      <div className="space-y-3 pt-4 border-t border-border/50">
+                        <h4 className="text-sm font-medium text-foreground">Caregiver Permissions</h4>
+
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                              <Bell className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">Receive Notifications</p>
+                              <p className="text-xs text-muted-foreground">Always enabled for caregivers</p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
+                            Active
+                          </Badge>
+                        </div>
+
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                              <CheckCircle className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">Mark Doses</p>
+                              <p className="text-xs text-muted-foreground">Allow marking medications as taken</p>
+                            </div>
+                          </div>
+                          <Switch
+                            checked={member.permissions.canMarkDoses}
+                            onCheckedChange={() => handleToggleMarkDoses(member.id)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
                         <Link href={`/settings/family/${member.id}/medications`}>
                           <Button variant="outline" className="w-full bg-transparent">
                             Manage Medication Access
