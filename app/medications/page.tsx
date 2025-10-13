@@ -28,7 +28,16 @@ export default function MedicationsPage() {
     return pillBoxes[0]?.id
   })
 
+  const [medicationFilter, setMedicationFilter] = useState<"active" | "archived">("active")
+
   const activePillBox = pillBoxes.find((pb) => pb.id === activePillBoxId) || pillBoxes[0]
+
+  const filteredMedications = activePillBox.medications.filter((med) => {
+    if (medicationFilter === "archived") {
+      return med.archived === true
+    }
+    return !med.archived // Show active (non-archived) medications
+  })
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -42,10 +51,21 @@ export default function MedicationsPage() {
       ...newMed,
       id: Date.now().toString(),
       createdAt: new Date(),
+      archived: false, // New medications are not archived
     }
 
     setPillBoxes((prev) =>
       prev.map((pb) => (pb.id === activePillBoxId ? { ...pb, medications: [...pb.medications, medication] } : pb)),
+    )
+  }
+
+  const handleArchiveMedication = (id: string) => {
+    setPillBoxes((prev) =>
+      prev.map((pb) =>
+        pb.id === activePillBoxId
+          ? { ...pb, medications: pb.medications.map((m) => (m.id === id ? { ...m, archived: true } : m)) }
+          : pb,
+      ),
     )
   }
 
@@ -56,6 +76,9 @@ export default function MedicationsPage() {
       ),
     )
   }
+
+  const activeMedicationsCount = activePillBox.medications.filter((m) => !m.archived).length
+  const archivedMedicationsCount = activePillBox.medications.filter((m) => m.archived).length
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -70,7 +93,7 @@ export default function MedicationsPage() {
               </Link>
               <div>
                 <h1 className="text-xl font-semibold">Medications</h1>
-                <p className="text-sm text-muted-foreground">{activePillBox.medications.length} active</p>
+                <p className="text-sm text-muted-foreground">{activeMedicationsCount} active</p>
               </div>
             </div>
             <AddMedicationDialog
@@ -110,7 +133,38 @@ export default function MedicationsPage() {
             </section>
           )}
 
-          <MedicationList medications={activePillBox.medications} onDelete={handleDeleteMedication} />
+          <section className="slide-up-enter">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setMedicationFilter("active")}
+                className={cn(
+                  "flex-1 px-4 py-2.5 rounded-2xl border-2 transition-all text-sm font-medium",
+                  medicationFilter === "active"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border/30 bg-background text-muted-foreground hover:border-primary/30",
+                )}
+              >
+                Active ({activeMedicationsCount})
+              </button>
+              <button
+                onClick={() => setMedicationFilter("archived")}
+                className={cn(
+                  "flex-1 px-4 py-2.5 rounded-2xl border-2 transition-all text-sm font-medium",
+                  medicationFilter === "archived"
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border/30 bg-background text-muted-foreground hover:border-primary/30",
+                )}
+              >
+                Archived ({archivedMedicationsCount})
+              </button>
+            </div>
+          </section>
+
+          <MedicationList
+            medications={filteredMedications}
+            onDelete={handleDeleteMedication}
+            onArchive={handleArchiveMedication}
+          />
         </div>
       </main>
 

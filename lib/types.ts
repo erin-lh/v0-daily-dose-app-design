@@ -11,6 +11,7 @@ export interface Medication {
   startDate: Date
   endDate?: Date // For temporary medications
   isActive: boolean
+  archived?: boolean // True if medication is archived (stays in history but not active)
   reminderEnabled: boolean
   createdAt: Date
 }
@@ -21,6 +22,7 @@ export interface DoseLog {
   scheduledTime: Date
   takenTime?: Date
   status: "taken" | "missed" | "pending" | "skipped"
+  skipReason?: string // Reason provided when skipping a dose
   pillBoxOpened?: boolean // Hardware integration
   createdAt: Date
 }

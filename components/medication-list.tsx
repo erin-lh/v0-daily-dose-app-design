@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MoreVertical, Clock, Calendar, Edit, Trash2 } from "lucide-react"
+import { MoreVertical, Clock, Calendar, Edit, Trash2, Archive } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Medication } from "@/lib/types"
 
@@ -11,9 +11,11 @@ interface MedicationListProps {
   medications: Medication[]
   onEdit?: (medication: Medication) => void
   onDelete?: (medicationId: string) => void
+  onArchive?: (medicationId: string) => void
+  isCaregiver?: boolean // If true, hide edit/delete/archive options
 }
 
-export function MedicationList({ medications, onEdit, onDelete }: MedicationListProps) {
+export function MedicationList({ medications, onEdit, onDelete, onArchive, isCaregiver = false }: MedicationListProps) {
   const formatTimes = (times: string[]) => {
     return times.join(", ")
   }
@@ -66,23 +68,29 @@ export function MedicationList({ medications, onEdit, onDelete }: MedicationList
               </div>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="shrink-0">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit?.(med)}>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete?.(med.id)} className="text-destructive">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {!isCaregiver && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="shrink-0">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onEdit?.(med)}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onArchive?.(med.id)}>
+                    <Archive className="w-4 h-4 mr-2" />
+                    Archive
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onDelete?.(med.id)} className="text-destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </Card>
       ))}

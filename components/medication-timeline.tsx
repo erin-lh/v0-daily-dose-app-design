@@ -138,6 +138,11 @@ export function MedicationTimeline({ doseLogs, medications, days = 7 }: Medicati
                             </>
                           )}
                         </div>
+                        {log.status === "skipped" && log.skipReason && (
+                          <div className="mt-2 text-xs text-muted-foreground italic bg-muted/30 rounded px-2 py-1.5">
+                            Reason: {log.skipReason}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )

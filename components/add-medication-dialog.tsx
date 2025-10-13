@@ -26,7 +26,7 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
   const [format, setFormat] = useState<"pill" | "cream" | "injection" | "liquid" | "inhaler" | "patch" | "other" | "">(
     "",
   )
-  const [notInPillBox, setNotInPillBox] = useState(false)
+  const [notInDosey, setNotInDosey] = useState(false)
   const [frequency, setFrequency] = useState<"daily" | "multiple" | "as-needed" | "temporary">("daily")
   const [times, setTimes] = useState<string[]>(["08:00"])
   const [isTemporary, setIsTemporary] = useState(false)
@@ -56,7 +56,7 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
       dosage,
       color: color || undefined,
       format: format || undefined,
-      notInPillBox: notInPillBox || undefined,
+      notInDosey: notInDosey || undefined,
       frequency,
       times,
       startDate: new Date(),
@@ -71,7 +71,7 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
     setDosage("")
     setColor("")
     setFormat("")
-    setNotInPillBox(false)
+    setNotInDosey(false)
     setFrequency("daily")
     setTimes(["08:00"])
     setIsTemporary(false)
@@ -213,13 +213,13 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
             </div>
           </div>
 
-          {/* Not Stored in PillBox Toggle */}
+          {/* Not Stored in Dosey Toggle */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Not Stored in PillBox</Label>
+              <Label>Not stored in pillbox</Label>
               <p className="text-xs text-muted-foreground">For medications in fridge, etc.</p>
             </div>
-            <Switch checked={notInPillBox} onCheckedChange={setNotInPillBox} />
+            <Switch checked={notInDosey} onCheckedChange={setNotInDosey} />
           </div>
 
           {/* Temporary Medication */}

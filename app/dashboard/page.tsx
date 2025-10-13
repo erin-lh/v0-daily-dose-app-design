@@ -60,6 +60,23 @@ export default function DashboardPage() {
     )
   }
 
+  const handleSkip = (medicationId: string, reason: string) => {
+    setPillBoxes((prev) =>
+      prev.map((pb) =>
+        pb.id === activePillBoxId
+          ? {
+              ...pb,
+              doseLogs: pb.doseLogs.map((log) =>
+                log.medicationId === medicationId && log.status === "pending"
+                  ? { ...log, status: "skipped", skipReason: reason }
+                  : log,
+              ),
+            }
+          : pb,
+      ),
+    )
+  }
+
   const handleAddMedication = (newMed: Omit<Medication, "id" | "createdAt">) => {
     const medication: Medication = {
       ...newMed,
@@ -142,6 +159,7 @@ export default function DashboardPage() {
               medications={activePillBox.medications}
               doseLogs={activePillBox.doseLogs}
               onMarkTaken={handleMarkTaken}
+              onSkip={handleSkip}
             />
           </section>
 
