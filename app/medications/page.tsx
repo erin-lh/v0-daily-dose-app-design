@@ -30,6 +30,9 @@ export default function MedicationsPage() {
 
   const [medicationFilter, setMedicationFilter] = useState<"active" | "archived">("active")
 
+  const [editingMedication, setEditingMedication] = useState<Medication | null>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+
   const activePillBox = pillBoxes.find((pb) => pb.id === activePillBoxId) || pillBoxes[0]
 
   const filteredMedications = activePillBox.medications.filter((med) => {
@@ -63,7 +66,7 @@ export default function MedicationsPage() {
     setPillBoxes((prev) =>
       prev.map((pb) =>
         pb.id === activePillBoxId
-          ? { ...pb, medications: pb.medications.map((m) => (m.id === id ? { ...m, archived: true } : m)) }
+          ? { ...pb, medications: pb.medications.map((m) => (m.id === id ? { ...m, archived: !m.archived } : m)) }
           : pb,
       ),
     )
@@ -75,6 +78,26 @@ export default function MedicationsPage() {
         pb.id === activePillBoxId ? { ...pb, medications: pb.medications.filter((m) => m.id !== id) } : pb,
       ),
     )
+  }
+
+  const handleEditMedication = (medication: Medication) => {
+    setEditingMedication(medication)
+    setEditDialogOpen(true)
+  }
+
+  const handleUpdateMedication = (id: string, updatedMed: Omit<Medication, "id" | "createdAt">) => {
+    setPillBoxes((prev) =>
+      prev.map((pb) =>
+        pb.id === activePillBoxId
+          ? {
+              ...pb,
+              medications: pb.medications.map((m) => (m.id === id ? { ...m, ...updatedMed } : m)),
+            }
+          : pb,
+      ),
+    )
+    setEditingMedication(null)
+    setEditDialogOpen(false)
   }
 
   const activeMedicationsCount = activePillBox.medications.filter((m) => !m.archived).length
@@ -162,6 +185,7 @@ export default function MedicationsPage() {
 
           <MedicationList
             medications={filteredMedications}
+            onEdit={handleEditMedication}
             onDelete={handleDeleteMedication}
             onArchive={handleArchiveMedication}
           />
@@ -169,6 +193,21 @@ export default function MedicationsPage() {
       </main>
 
       <BottomNav />
+
+      {editingMedication && (
+        <AddMedicationDialog
+          medication={editingMedication}
+          onAdd={handleAddMedication}
+          onEdit={handleUpdateMedication}
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open)
+            if (!open) {
+              setEditingMedication(null)
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

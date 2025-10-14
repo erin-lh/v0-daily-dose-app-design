@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,24 +14,58 @@ import type { Medication } from "@/lib/types"
 
 interface AddMedicationDialogProps {
   onAdd: (medication: Omit<Medication, "id" | "createdAt">) => void
+  onEdit?: (id: string, medication: Omit<Medication, "id" | "createdAt">) => void
+  medication?: Medication // If provided, dialog is in edit mode
   trigger?: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps) {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [dosage, setDosage] = useState("")
-  const [color, setColor] = useState("")
+export function AddMedicationDialog({
+  onAdd,
+  onEdit,
+  medication,
+  trigger,
+  open: controlledOpen,
+  onOpenChange,
+}: AddMedicationDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
+
+  const [name, setName] = useState(medication?.name || "")
+  const [description, setDescription] = useState(medication?.description || "")
+  const [dosage, setDosage] = useState(medication?.dosage || "")
+  const [color, setColor] = useState(medication?.color || "")
   const [format, setFormat] = useState<"pill" | "cream" | "injection" | "liquid" | "inhaler" | "patch" | "other" | "">(
-    "",
+    medication?.format || "",
   )
-  const [notInDosey, setNotInDosey] = useState(false)
-  const [frequency, setFrequency] = useState<"daily" | "multiple" | "as-needed" | "temporary">("daily")
-  const [times, setTimes] = useState<string[]>(["08:00"])
-  const [isTemporary, setIsTemporary] = useState(false)
-  const [endDate, setEndDate] = useState("")
-  const [reminderEnabled, setReminderEnabled] = useState(true)
+  const [notInDosey, setNotInDosey] = useState(medication?.notInDosey || false)
+  const [frequency, setFrequency] = useState<"daily" | "multiple" | "as-needed" | "temporary">(
+    medication?.frequency || "daily",
+  )
+  const [times, setTimes] = useState<string[]>(medication?.times || ["08:00"])
+  const [isTemporary, setIsTemporary] = useState(!!medication?.endDate)
+  const [endDate, setEndDate] = useState(
+    medication?.endDate ? new Date(medication.endDate).toISOString().split("T")[0] : "",
+  )
+  const [reminderEnabled, setReminderEnabled] = useState(medication?.reminderEnabled ?? true)
+
+  useEffect(() => {
+    if (medication) {
+      setName(medication.name)
+      setDescription(medication.description || "")
+      setDosage(medication.dosage)
+      setColor(medication.color || "")
+      setFormat(medication.format || "")
+      setNotInDosey(medication.notInDosey || false)
+      setFrequency(medication.frequency)
+      setTimes(medication.times)
+      setIsTemporary(!!medication.endDate)
+      setEndDate(medication.endDate ? new Date(medication.endDate).toISOString().split("T")[0] : "")
+      setReminderEnabled(medication.reminderEnabled ?? true)
+    }
+  }, [medication])
 
   const handleAddTime = () => {
     setTimes([...times, "12:00"])
@@ -50,7 +84,7 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
   const handleSubmit = () => {
     if (!name || !dosage) return
 
-    onAdd({
+    const medicationData = {
       name,
       description: description || undefined,
       dosage,
@@ -59,11 +93,18 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
       notInDosey: notInDosey || undefined,
       frequency,
       times,
-      startDate: new Date(),
+      startDate: medication?.startDate || new Date(),
       endDate: isTemporary && endDate ? new Date(endDate) : undefined,
       isActive: true,
       reminderEnabled,
-    })
+      archived: medication?.archived || false,
+    }
+
+    if (medication && onEdit) {
+      onEdit(medication.id, medicationData)
+    } else {
+      onAdd(medicationData)
+    }
 
     // Reset form
     setName("")
@@ -92,7 +133,7 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Medication</DialogTitle>
+          <DialogTitle>{medication ? "Edit Medication" : "Add New Medication"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -255,7 +296,7 @@ export function AddMedicationDialog({ onAdd, trigger }: AddMedicationDialogProps
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={!name || !dosage} className="flex-1 bg-primary hover:bg-primary/90">
-            Add Medication
+            {medication ? "Save Changes" : "Add Medication"}
           </Button>
         </div>
       </DialogContent>

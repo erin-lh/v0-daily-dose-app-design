@@ -44,7 +44,7 @@ export function TodaySchedule({ medications, doseLogs, onMarkTaken, onSkip }: To
     return med.times[0]
   }
 
-  const activeMeds = localMedications.filter((m) => m.isActive)
+  const activeMeds = localMedications.filter((m) => m.isActive && !m.archived)
 
   const handleSkipClick = (med: Medication) => {
     setSelectedMedication(med)

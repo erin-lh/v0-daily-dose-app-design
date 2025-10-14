@@ -4,14 +4,14 @@ import { Card } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Moon, Lock, Shield, Database } from "lucide-react"
+import { Moon, Shield, Database } from "lucide-react"
 
 export function GeneralSettings() {
   return (
     <Card className="p-6">
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-foreground">General Settings</h2>
-        <p className="text-sm text-muted-foreground">Customize your app experience</p>
+        <p className="text-sm text-muted-foreground">Customise your app experience</p>
       </div>
 
       <div className="space-y-6">
@@ -38,20 +38,6 @@ export function GeneralSettings() {
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        {/* Lock Mode */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-accent/10 rounded-lg">
-              <Lock className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <Label htmlFor="lock-mode">Lock Mode</Label>
-              <p className="text-xs text-muted-foreground">Require PIN to open pill box</p>
-            </div>
-          </div>
-          <Switch id="lock-mode" />
         </div>
 
         {/* Privacy */}

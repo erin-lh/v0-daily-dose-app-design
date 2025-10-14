@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MoreVertical, Clock, Calendar, Edit, Trash2, Archive } from "lucide-react"
+import { MoreVertical, Clock, Calendar, Edit, Trash2, Archive, ArchiveRestore } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Medication } from "@/lib/types"
 
@@ -81,8 +81,17 @@ export function MedicationList({ medications, onEdit, onDelete, onArchive, isCar
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onArchive?.(med.id)}>
-                    <Archive className="w-4 h-4 mr-2" />
-                    Archive
+                    {med.archived ? (
+                      <>
+                        <ArchiveRestore className="w-4 h-4 mr-2" />
+                        Unarchive
+                      </>
+                    ) : (
+                      <>
+                        <Archive className="w-4 h-4 mr-2" />
+                        Archive
+                      </>
+                    )}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onDelete?.(med.id)} className="text-destructive">
                     <Trash2 className="w-4 h-4 mr-2" />
