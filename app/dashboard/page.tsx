@@ -4,19 +4,17 @@ import { cn } from "@/lib/utils"
 
 import { useState, useEffect, useRef } from "react"
 import { TodaySchedule } from "@/components/today-schedule"
-import { QuickStats } from "@/components/quick-stats"
 import { AddMedicationDialog } from "@/components/add-medication-dialog"
 import { Button } from "@/components/ui/button"
-import { Bell, Box } from "lucide-react"
-import { mockPillBoxes, mockPillBoxStatus } from "@/lib/mock-data"
+import { Bell } from "lucide-react"
+import { mockPillBoxes } from "@/lib/mock-data"
 import type { Medication, PillBox } from "@/lib/types"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { BrandLogoWithTagline } from "@/components/brand-logo"
 import { BottomNav } from "@/components/bottom-nav"
-import { PlantGrowth } from "@/components/plant-growth"
 import { QuickMenuFAB } from "@/components/quick-menu-fab"
-import { BoxCapacityBar } from "@/components/box-capacity-bar"
+import { TodaysAdherenceRing } from "@/components/todays-adherence-ring"
 
 export default function DashboardPage() {
   const [pillBoxes, setPillBoxes] = useState<PillBox[]>(() => {
@@ -114,7 +112,10 @@ export default function DashboardPage() {
 
   const activeMedications = activePillBox.medications.filter((m) => !m.archived)
   const todayTotalDoses = activeMedications.reduce((total, med) => total + med.times.length, 0)
-  const todayTaken = activePillBox.doseLogs.filter((log) => log.status === "taken").length
+  const activeMedicationIds = new Set(activeMedications.map((m) => m.id))
+  const todayTaken = activePillBox.doseLogs.filter(
+    (log) => log.status === "taken" && activeMedicationIds.has(log.medicationId),
+  ).length
   const adherenceRate = todayTotalDoses > 0 ? Math.round((todayTaken / todayTotalDoses) * 100) : 0
 
   return (
@@ -134,14 +135,7 @@ export default function DashboardPage() {
                   )}
                 </Button>
               </Link>
-              <Link href="/device">
-                <Button variant="ghost" size="icon" className="relative rounded-full h-11 w-11">
-                  <Box className="w-5 h-5 text-foreground/70" />
-                  {mockPillBoxStatus.isConnected && (
-                    <Badge className="absolute top-1.5 right-1.5 w-2.5 h-2.5 p-0 bg-success border-2 border-background rounded-full" />
-                  )}
-                </Button>
-              </Link>
+              {/* Removed pill box status button from dashboard header */}
             </div>
           </div>
         </div>
@@ -172,23 +166,15 @@ export default function DashboardPage() {
           )}
 
           <section className="slide-up-enter" style={{ animationDelay: "0.05s" }}>
-            <PlantGrowth adherenceRate={adherenceRate} daysActive={52} />
-          </section>
-
-          <section className="slide-up-enter" style={{ animationDelay: "0.075s" }}>
-            <BoxCapacityBar
-              totalDoses={totalWeeklyDoses}
-              remainingDoses={totalWeeklyDoses - todayTaken}
-              daysUntilRefill={daysUntilRefill}
-              variant="full"
+            <TodaysAdherenceRing
+              adherenceRate={adherenceRate}
+              todayTaken={todayTaken}
+              todayTotal={todayTotalDoses}
+              nextDoseIn="2h 15m"
             />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
-            <QuickStats todayTaken={todayTaken} todayTotal={todayTotalDoses} weeklyAdherence={92} nextDoseIn="2h 15m" />
-          </section>
-
-          <section ref={todayScheduleRef} className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
+          <section ref={todayScheduleRef} className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
             <TodaySchedule
               medications={activePillBox.medications}
               doseLogs={activePillBox.doseLogs}

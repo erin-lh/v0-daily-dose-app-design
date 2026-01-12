@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Target } from "lucide-react"
+import { ArrowLeft, Target, Box } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { BottomNav } from "@/components/bottom-nav"
@@ -12,8 +12,10 @@ import { TimingInsights } from "@/components/timing-insights"
 import { AISuggestions } from "@/components/ai-suggestions"
 import { MedicationTimeline } from "@/components/medication-timeline"
 import { BoxCapacityBar } from "@/components/box-capacity-bar"
-import { mockInsightData, mockInsightSuggestions, mockPillBoxes } from "@/lib/mock-data"
+import { mockInsightData, mockInsightSuggestions, mockPillBoxes, mockPillBoxStatus } from "@/lib/mock-data"
 import type { PillBox } from "@/lib/types"
+import { Badge } from "@/components/ui/badge" // Added import for Badge
+import { cn } from "@/lib/utils" // Added import for cn
 
 export default function InsightsPage() {
   const [pillBoxes] = useState<PillBox[]>(() => {
@@ -46,12 +48,10 @@ export default function InsightsPage() {
       return total + med.times.length
     }, 0)
 
-    // Count completed doses from localStorage
-    const completedKey = `dailydose-completed-${activePillBoxId}-${new Date().toDateString()}`
-    const completed = localStorage.getItem(completedKey)
-    const completedDoses = completed ? JSON.parse(completed) : []
+    // Count completed doses from doseLogs
+    const completedDoses = activePillBox.doseLogs.filter((log) => log.status === "taken").length
 
-    const adherenceRate = totalDosesToday > 0 ? (completedDoses.length / totalDosesToday) * 100 : 0
+    const adherenceRate = totalDosesToday > 0 ? (completedDoses / totalDosesToday) * 100 : 0
     setTodayAdherence(adherenceRate)
   }, [pillBoxes, activePillBoxId])
 
@@ -87,6 +87,17 @@ export default function InsightsPage() {
               <Target className="w-5 h-5 text-primary" />
               <h1 className="text-xl font-semibold">Habit Insights</h1>
             </div>
+            {/* Added pill box status button to insights header */}
+            <div className="ml-auto">
+              <Link href="/device">
+                <Button variant="ghost" size="icon" className="relative rounded-full h-10 w-10">
+                  <Box className="w-5 h-5 text-foreground/70" />
+                  {mockPillBoxStatus.isConnected && (
+                    <Badge className="absolute top-1 right-1 w-2.5 h-2.5 p-0 bg-success border-2 border-background rounded-full" />
+                  )}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -94,10 +105,39 @@ export default function InsightsPage() {
       <main className="px-5 py-6">
         <div className="space-y-6 max-w-lg mx-auto">
           <section className="slide-up-enter">
-            <AdherencePieChart adherenceRate={todayAdherence} daysSinceJoined={52} />
+            <Link href="/device">
+              <Card className="p-4 bg-card border-border/30 hover:border-primary/30 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Box className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold">Pill Box Status</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {mockPillBoxStatus.isConnected ? "Connected" : "Disconnected"}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge
+                    variant={mockPillBoxStatus.isConnected ? "default" : "secondary"}
+                    className={cn(
+                      "text-xs",
+                      mockPillBoxStatus.isConnected ? "bg-success/10 text-success border-success/20" : "",
+                    )}
+                  >
+                    {mockPillBoxStatus.batteryLevel}%
+                  </Badge>
+                </div>
+              </Card>
+            </Link>
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.05s" }}>
+            <AdherencePieChart adherenceRate={todayAdherence} daysSinceJoined={52} />
+          </section>
+
+          <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
             <BoxCapacityBar
               totalDoses={totalWeeklyDoses}
               remainingDoses={remainingDoses}
@@ -106,23 +146,23 @@ export default function InsightsPage() {
             />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
+          <section className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
             <AdherenceChart data={mockInsightData} medications={activePillBox.medications} />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
+          <section className="slide-up-enter" style={{ animationDelay: "0.2s" }}>
             <AISuggestions suggestions={mockInsightSuggestions} />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.2s" }}>
+          <section className="slide-up-enter" style={{ animationDelay: "0.25s" }}>
             <TimingInsights data={mockInsightData} />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.25s" }}>
+          <section className="slide-up-enter" style={{ animationDelay: "0.3s" }}>
             <MedicationTimeline doseLogs={activePillBox.doseLogs} medications={activePillBox.medications} days={7} />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.3s" }}>
+          <section className="slide-up-enter" style={{ animationDelay: "0.35s" }}>
             <Card className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
               <h3 className="text-base font-semibold mb-2">Keep Going!</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
