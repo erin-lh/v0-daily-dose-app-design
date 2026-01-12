@@ -42,7 +42,7 @@ export default function HomePage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5 py-12">
         <div className="w-full max-w-md space-y-12 slide-up-enter">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-4 flex flex-col items-center">
             <BrandLogo className="mx-auto" />
             <p className="text-muted-foreground text-base leading-relaxed px-4">
               Stay consistent with your wellness routine
