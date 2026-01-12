@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card"
 import { GeneralSettings } from "@/components/general-settings"
 import { AccountSettings } from "@/components/account-settings"
 import { NotificationSettings } from "@/components/notification-settings"
+import { BoxRefillSettings } from "@/components/box-refill-settings"
 import { ArrowLeft, Users, ChevronRight, LogOut, Box } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -72,6 +73,8 @@ export default function SettingsPage() {
           </Card>
 
           <NotificationSettings />
+
+          <BoxRefillSettings />
 
           <GeneralSettings />
           <AccountSettings />

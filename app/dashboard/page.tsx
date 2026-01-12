@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { TodaySchedule } from "@/components/today-schedule"
 import { QuickStats } from "@/components/quick-stats"
 import { AddMedicationDialog } from "@/components/add-medication-dialog"
@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge"
 import { BrandLogoWithTagline } from "@/components/brand-logo"
 import { BottomNav } from "@/components/bottom-nav"
 import { PlantGrowth } from "@/components/plant-growth"
+import { QuickMenuFAB } from "@/components/quick-menu-fab"
+import { BoxCapacityBar } from "@/components/box-capacity-bar"
 
 export default function DashboardPage() {
   const [pillBoxes, setPillBoxes] = useState<PillBox[]>(() => {
@@ -89,9 +91,31 @@ export default function DashboardPage() {
     )
   }
 
+  const todayScheduleRef = useRef<HTMLDivElement>(null)
+  const [showAddDialog, setShowAddDialog] = useState(false)
+
+  const totalWeeklyDoses = activePillBox.medications
+    .filter((m) => !m.archived)
+    .reduce((total, med) => total + med.times.length * 7, 0)
+  const daysUntilRefill = 3 // This would be calculated based on refill day settings
+
+  const handleQuickMarkComplete = () => {
+    todayScheduleRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
+
+  const handleQuickAddMeds = () => {
+    setShowAddDialog(true)
+  }
+
+  const handleRefillComplete = () => {
+    // Store refill completion in localStorage
+    localStorage.setItem(`dailydose-last-refill-${activePillBoxId}`, new Date().toISOString())
+  }
+
+  const activeMedications = activePillBox.medications.filter((m) => !m.archived)
+  const todayTotalDoses = activeMedications.reduce((total, med) => total + med.times.length, 0)
   const todayTaken = activePillBox.doseLogs.filter((log) => log.status === "taken").length
-  const todayTotal = activePillBox.medications.filter((m) => m.isActive).length
-  const adherenceRate = todayTotal > 0 ? Math.round((todayTaken / todayTotal) * 100) : 0
+  const adherenceRate = todayTotalDoses > 0 ? Math.round((todayTaken / todayTotalDoses) * 100) : 0
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -151,11 +175,20 @@ export default function DashboardPage() {
             <PlantGrowth adherenceRate={adherenceRate} daysActive={52} />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
-            <QuickStats todayTaken={todayTaken} todayTotal={todayTotal} weeklyAdherence={92} nextDoseIn="2h 15m" />
+          <section className="slide-up-enter" style={{ animationDelay: "0.075s" }}>
+            <BoxCapacityBar
+              totalDoses={totalWeeklyDoses}
+              remainingDoses={totalWeeklyDoses - todayTaken}
+              daysUntilRefill={daysUntilRefill}
+              variant="full"
+            />
           </section>
 
-          <section className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
+          <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
+            <QuickStats todayTaken={todayTaken} todayTotal={todayTotalDoses} weeklyAdherence={92} nextDoseIn="2h 15m" />
+          </section>
+
+          <section ref={todayScheduleRef} className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
             <TodaySchedule
               medications={activePillBox.medications}
               doseLogs={activePillBox.doseLogs}
@@ -165,10 +198,16 @@ export default function DashboardPage() {
           </section>
 
           <section className="flex justify-center pt-6 pb-12">
-            <AddMedicationDialog onAdd={handleAddMedication} />
+            <AddMedicationDialog onAdd={handleAddMedication} open={showAddDialog} onOpenChange={setShowAddDialog} />
           </section>
         </div>
       </main>
+
+      <QuickMenuFAB
+        onMarkComplete={handleQuickMarkComplete}
+        onAddMeds={handleQuickAddMeds}
+        onRefillComplete={handleRefillComplete}
+      />
 
       <BottomNav />
     </div>

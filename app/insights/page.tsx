@@ -11,6 +11,7 @@ import { AdherencePieChart } from "@/components/adherence-pie-chart"
 import { TimingInsights } from "@/components/timing-insights"
 import { AISuggestions } from "@/components/ai-suggestions"
 import { MedicationTimeline } from "@/components/medication-timeline"
+import { BoxCapacityBar } from "@/components/box-capacity-bar"
 import { mockInsightData, mockInsightSuggestions, mockPillBoxes } from "@/lib/mock-data"
 import type { PillBox } from "@/lib/types"
 
@@ -56,6 +57,13 @@ export default function InsightsPage() {
 
   const activePillBox = pillBoxes.find((pb) => pb.id === activePillBoxId) || pillBoxes[0]
 
+  const totalWeeklyDoses = activePillBox.medications
+    .filter((m) => !m.archived)
+    .reduce((total, med) => total + med.times.length * 7, 0)
+  const dosesCompleted = activePillBox.doseLogs.filter((log) => log.status === "taken").length
+  const remainingDoses = Math.max(0, totalWeeklyDoses - dosesCompleted)
+  const daysUntilRefill = 3
+
   const stats = [
     {
       label: "Total Doses",
@@ -87,6 +95,15 @@ export default function InsightsPage() {
         <div className="space-y-6 max-w-lg mx-auto">
           <section className="slide-up-enter">
             <AdherencePieChart adherenceRate={todayAdherence} daysSinceJoined={52} />
+          </section>
+
+          <section className="slide-up-enter" style={{ animationDelay: "0.05s" }}>
+            <BoxCapacityBar
+              totalDoses={totalWeeklyDoses}
+              remainingDoses={remainingDoses}
+              daysUntilRefill={daysUntilRefill}
+              variant="compact"
+            />
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>

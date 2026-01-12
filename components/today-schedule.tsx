@@ -1,13 +1,13 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, Clock, AlertCircle, Circle } from "lucide-react"
 import type { Medication, DoseLog } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { SkipMedicationDialog } from "./skip-medication-dialog"
+import { HoldToCompleteButton } from "./hold-to-complete-button"
 
 interface TodayScheduleProps {
   medications: Medication[]
@@ -115,10 +115,11 @@ export function TodaySchedule({ medications, doseLogs, onMarkTaken, onSkip }: To
                 </div>
 
                 {status === "pending" && (
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" onClick={() => onMarkTaken(med.id)} className="bg-primary hover:bg-primary/90">
-                      Done
-                    </Button>
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-center gap-1">
+                      <HoldToCompleteButton onComplete={() => onMarkTaken(med.id)} />
+                      <span className="text-[10px] text-muted-foreground">Hold</span>
+                    </div>
                     {onSkip && (
                       <button
                         onClick={() => handleSkipClick(med)}

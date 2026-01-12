@@ -1,6 +1,6 @@
 "use client"
 
-import { Sprout, Droplets } from "lucide-react"
+import { Droplets } from "lucide-react"
 
 interface PlantGrowthProps {
   adherenceRate: number // 0-100
@@ -23,13 +23,6 @@ export function PlantGrowth({ adherenceRate, daysActive }: PlantGrowthProps) {
     if (adherenceRate >= 70) return "Your routine is growing strong"
     if (adherenceRate >= 50) return "Keep nurturing your habits"
     return "Time to water your wellness"
-  }
-
-  const getPlantHeight = () => {
-    if (adherenceRate >= 90) return "h-24"
-    if (adherenceRate >= 70) return "h-20"
-    if (adherenceRate >= 50) return "h-16"
-    return "h-12"
   }
 
   return (
@@ -57,46 +50,11 @@ export function PlantGrowth({ adherenceRate, daysActive }: PlantGrowthProps) {
         <div className="flex items-end justify-center gap-8 mt-8">
           {/* Plant pot with growth stages */}
           <div className="flex flex-col items-center">
-            <div className={`transition-all duration-500 ${getPlantHeight()} flex items-end justify-center mb-2`}>
-              {adherenceRate >= 90 ? (
-                // Thriving plant - full grown
-                <div className="relative">
-                  <div className="flex gap-1">
-                    <div className="w-8 h-12 bg-success rounded-full border-2 border-success-foreground/20" />
-                    <div className="w-8 h-14 bg-success rounded-full border-2 border-success-foreground/20" />
-                    <div className="w-8 h-12 bg-success rounded-full border-2 border-success-foreground/20" />
-                  </div>
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-2xl animate-bounce">✨</div>
-                </div>
-              ) : adherenceRate >= 70 ? (
-                // Growing plant - two leaves
-                <div className="flex gap-1">
-                  <div className="w-7 h-10 bg-success/90 rounded-full border-2 border-success-foreground/20" />
-                  <div className="w-7 h-12 bg-success/90 rounded-full border-2 border-success-foreground/20" />
-                </div>
-              ) : adherenceRate >= 50 ? (
-                // Sprouting - one leaf
-                <div className="w-6 h-8 bg-success/70 rounded-full border-2 border-success-foreground/20" />
-              ) : (
-                // Seedling - just sprouting
-                <Sprout className="w-6 h-6 text-success/50" />
-              )}
-            </div>
-
-            {/* Pot */}
-            <div className="relative">
-              <div className="w-20 h-16 bg-gradient-to-b from-[#d4997d] to-[#c4896d] rounded-b-2xl border-2 border-[#b4795d]">
-                <div className="w-full h-3 bg-[#8b6f47] border-b-2 border-[#6b5f37]" />
-                {/* Cute face on pot */}
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  <div className="w-1.5 h-1.5 bg-[#8b6f47] rounded-full" />
-                  <div className="w-1.5 h-1.5 bg-[#8b6f47] rounded-full" />
-                </div>
-                <div className="flex justify-center mt-1">
-                  <div className="w-3 h-1 border-b-2 border-[#8b6f47] rounded-full" />
-                </div>
-              </div>
-            </div>
+            <img
+              src="/images/screenshot-202026-01-12-20at-205.png"
+              alt="Wellness plant"
+              className="w-32 h-32 object-contain"
+            />
           </div>
 
           {/* Stats */}
