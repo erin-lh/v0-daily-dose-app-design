@@ -103,9 +103,9 @@ export default function HomePage() {
             <button onClick={() => setMode("select")} className="text-muted-foreground text-sm hover:text-foreground">
               ← Back
             </button>
-            <div className="space-y-3">
+            <div className="space-y-3 flex flex-col items-center text-center">
               <BrandLogo />
-              <h1 className="text-3xl font-semibold text-foreground">Welcome back</h1>
+              <h1 className="text-3xl font-semibold text-foreground">Welcome!</h1>
               <p className="text-muted-foreground text-base">Sign in to continue your wellness journey</p>
             </div>
           </div>

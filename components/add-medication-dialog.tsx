@@ -37,9 +37,9 @@ export function AddMedicationDialog({
   const [description, setDescription] = useState(medication?.description || "")
   const [dosage, setDosage] = useState(medication?.dosage || "")
   const [color, setColor] = useState(medication?.color || "")
-  const [format, setFormat] = useState<"pill" | "cream" | "injection" | "liquid" | "inhaler" | "patch" | "other" | "">(
-    medication?.format || "",
-  )
+  const [format, setFormat] = useState<
+    "pill" | "cream" | "injection" | "liquid" | "inhaler" | "patch" | "powder" | "other" | ""
+  >(medication?.format || "")
   const [notInDosey, setNotInDosey] = useState(medication?.notInDosey || false)
   const [frequency, setFrequency] = useState<"daily" | "multiple" | "as-needed" | "temporary">(
     medication?.frequency || "daily",
@@ -195,6 +195,7 @@ export function AddMedicationDialog({
                   <SelectItem value="liquid">Liquid/Syrup</SelectItem>
                   <SelectItem value="inhaler">Inhaler</SelectItem>
                   <SelectItem value="patch">Patch</SelectItem>
+                  <SelectItem value="powder">Powder</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
