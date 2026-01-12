@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils"
 
 import { useState, useEffect } from "react"
-import { StreakCard } from "@/components/streak-card"
 import { TodaySchedule } from "@/components/today-schedule"
 import { QuickStats } from "@/components/quick-stats"
 import { AddMedicationDialog } from "@/components/add-medication-dialog"
@@ -15,6 +14,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { BrandLogoWithTagline } from "@/components/brand-logo"
 import { BottomNav } from "@/components/bottom-nav"
+import { PlantGrowth } from "@/components/plant-growth"
 
 export default function DashboardPage() {
   const [pillBoxes, setPillBoxes] = useState<PillBox[]>(() => {
@@ -91,6 +91,7 @@ export default function DashboardPage() {
 
   const todayTaken = activePillBox.doseLogs.filter((log) => log.status === "taken").length
   const todayTotal = activePillBox.medications.filter((m) => m.isActive).length
+  const adherenceRate = todayTotal > 0 ? Math.round((todayTaken / todayTotal) * 100) : 0
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -147,7 +148,7 @@ export default function DashboardPage() {
           )}
 
           <section className="slide-up-enter" style={{ animationDelay: "0.05s" }}>
-            <StreakCard streak={activePillBox.streak} />
+            <PlantGrowth adherenceRate={adherenceRate} daysActive={52} />
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>

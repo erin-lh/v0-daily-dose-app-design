@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, TrendingUp, Award, Target } from "lucide-react"
+import { ArrowLeft, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { BottomNav } from "@/components/bottom-nav"
 import { AdherenceChart } from "@/components/adherence-chart"
+import { AdherencePieChart } from "@/components/adherence-pie-chart"
 import { TimingInsights } from "@/components/timing-insights"
 import { AISuggestions } from "@/components/ai-suggestions"
 import { MedicationTimeline } from "@/components/medication-timeline"
@@ -30,21 +31,32 @@ export default function InsightsPage() {
     return pillBoxes[0]?.id
   })
 
+  const [todayAdherence, setTodayAdherence] = useState(0)
+
+  useEffect(() => {
+    const activePillBox = pillBoxes.find((pb) => pb.id === activePillBoxId) || pillBoxes[0]
+    if (!activePillBox) return
+
+    // Get active medications only
+    const activeMedications = activePillBox.medications.filter((med) => !med.archived)
+
+    // Count total doses for today
+    const totalDosesToday = activeMedications.reduce((total, med) => {
+      return total + med.times.length
+    }, 0)
+
+    // Count completed doses from localStorage
+    const completedKey = `dailydose-completed-${activePillBoxId}-${new Date().toDateString()}`
+    const completed = localStorage.getItem(completedKey)
+    const completedDoses = completed ? JSON.parse(completed) : []
+
+    const adherenceRate = totalDosesToday > 0 ? (completedDoses.length / totalDosesToday) * 100 : 0
+    setTodayAdherence(adherenceRate)
+  }, [pillBoxes, activePillBoxId])
+
   const activePillBox = pillBoxes.find((pb) => pb.id === activePillBoxId) || pillBoxes[0]
 
   const stats = [
-    {
-      label: "Current Streak",
-      value: `${activePillBox.streak.currentStreak} days`,
-      icon: Award,
-      color: "text-primary",
-    },
-    {
-      label: "Adherence Rate",
-      value: `${Math.round(activePillBox.streak.adherenceRate)}%`,
-      icon: TrendingUp,
-      color: "text-primary",
-    },
     {
       label: "Total Doses",
       value: activePillBox.streak.totalDosesTaken,
@@ -64,7 +76,7 @@ export default function InsightsPage() {
               </Button>
             </Link>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
+              <Target className="w-5 h-5 text-primary" />
               <h1 className="text-xl font-semibold">Habit Insights</h1>
             </div>
           </div>
@@ -73,41 +85,32 @@ export default function InsightsPage() {
 
       <main className="px-5 py-6">
         <div className="space-y-6 max-w-lg mx-auto">
-          <section className="grid grid-cols-3 gap-3 slide-up-enter">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon
-              return (
-                <Card key={index} className="p-4 text-center">
-                  <Icon className={`w-5 h-5 mx-auto mb-2 ${stat.color}`} />
-                  <p className="text-lg font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </Card>
-              )
-            })}
-          </section>
-
-          <section className="slide-up-enter" style={{ animationDelay: "0.05s" }}>
-            <AdherenceChart data={mockInsightData} />
+          <section className="slide-up-enter">
+            <AdherencePieChart adherenceRate={todayAdherence} daysSinceJoined={52} />
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.1s" }}>
-            <AISuggestions suggestions={mockInsightSuggestions} />
+            <AdherenceChart data={mockInsightData} medications={activePillBox.medications} />
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.15s" }}>
-            <TimingInsights data={mockInsightData} />
+            <AISuggestions suggestions={mockInsightSuggestions} />
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.2s" }}>
-            <MedicationTimeline doseLogs={activePillBox.doseLogs} medications={activePillBox.medications} days={7} />
+            <TimingInsights data={mockInsightData} />
           </section>
 
           <section className="slide-up-enter" style={{ animationDelay: "0.25s" }}>
+            <MedicationTimeline doseLogs={activePillBox.doseLogs} medications={activePillBox.medications} days={7} />
+          </section>
+
+          <section className="slide-up-enter" style={{ animationDelay: "0.3s" }}>
             <Card className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
               <h3 className="text-base font-semibold mb-2">Keep Going!</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                You're building a strong routine. Consistency is key to better health outcomes. Your current streak of{" "}
-                {activePillBox.streak.currentStreak} days shows real commitment.
+                You're building a strong routine. Consistency is key to better health outcomes. Your adherence rate of{" "}
+                {Math.round(todayAdherence)}% shows real commitment.
               </p>
             </Card>
           </section>

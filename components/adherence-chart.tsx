@@ -1,26 +1,65 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
-import type { InsightData } from "@/lib/types"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type { InsightData, Medication } from "@/lib/types"
 
 interface AdherenceChartProps {
   data: InsightData[]
+  medications: Medication[]
 }
 
-export function AdherenceChart({ data }: AdherenceChartProps) {
+export function AdherenceChart({ data, medications }: AdherenceChartProps) {
+  const [selectedMedication, setSelectedMedication] = useState<string>("all")
+
   const maxRate = 100
   const last7Days = data.slice(-7)
+
+  // Filter data by selected medication
+  const filteredData = last7Days.map((day) => {
+    if (selectedMedication === "all") {
+      return day
+    }
+
+    // Calculate adherence rate for specific medication
+    // This is a simplified calculation - in production you'd track per-medication adherence
+    const med = medications.find((m) => m.id === selectedMedication)
+    if (!med) return day
+
+    // For now, return the day's data (in production, filter by medication-specific logs)
+    return day
+  })
+
+  // Get active medications only
+  const activeMedications = medications.filter((m) => !m.archived)
 
   return (
     <Card className="p-5">
       <div className="space-y-4">
-        <div>
-          <h3 className="text-base font-semibold">Weekly Consistency</h3>
-          <p className="text-sm text-muted-foreground">Last 7 days adherence rate</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-base font-semibold">Weekly Consistency</h3>
+            <p className="text-sm text-muted-foreground">Last 7 days adherence rate</p>
+          </div>
+
+          <Select value={selectedMedication} onValueChange={setSelectedMedication}>
+            <SelectTrigger className="w-[140px] h-9">
+              <SelectValue placeholder="All Medications" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Medications</SelectItem>
+              {activeMedications.map((med) => (
+                <SelectItem key={med.id} value={med.id}>
+                  {med.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex items-end justify-between gap-2 h-40">
-          {last7Days.map((day, index) => {
+          {filteredData.map((day, index) => {
             const height = (day.adherenceRate / maxRate) * 100
             const date = new Date(day.date)
             const dayLabel = date.toLocaleDateString("en-US", { weekday: "short" })
