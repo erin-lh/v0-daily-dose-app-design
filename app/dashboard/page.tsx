@@ -44,19 +44,48 @@ export default function DashboardPage() {
   }, [pillBoxes, activePillBoxId])
 
   const handleMarkTaken = (medicationId: string) => {
+    console.log("[v0] handleMarkTaken called for medication:", medicationId)
+
     setPillBoxes((prev) =>
-      prev.map((pb) =>
-        pb.id === activePillBoxId
-          ? {
-              ...pb,
-              doseLogs: pb.doseLogs.map((log) =>
-                log.medicationId === medicationId && log.status === "pending"
-                  ? { ...log, status: "taken", takenTime: new Date(), pillBoxOpened: true }
-                  : log,
-              ),
-            }
-          : pb,
-      ),
+      prev.map((pb) => {
+        if (pb.id !== activePillBoxId) return pb
+
+        const today = new Date().toISOString().split("T")[0]
+        const existingLog = pb.doseLogs.find(
+          (log) => log.medicationId === medicationId && log.scheduledTime.toISOString().split("T")[0] === today,
+        )
+
+        console.log("[v0] Existing log found:", existingLog)
+
+        if (existingLog) {
+          // Update existing log
+          return {
+            ...pb,
+            doseLogs: pb.doseLogs.map((log) =>
+              log.medicationId === medicationId && log.status === "pending"
+                ? { ...log, status: "taken", takenTime: new Date(), pillBoxOpened: true }
+                : log,
+            ),
+          }
+        } else {
+          // Create new dose log if none exists
+          const newLog = {
+            id: Date.now().toString(),
+            medicationId,
+            scheduledTime: new Date(),
+            status: "taken" as const,
+            takenTime: new Date(),
+            pillBoxOpened: true,
+          }
+
+          console.log("[v0] Creating new dose log:", newLog)
+
+          return {
+            ...pb,
+            doseLogs: [...pb.doseLogs, newLog],
+          }
+        }
+      }),
     )
   }
 
